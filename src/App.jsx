@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 
+// ---------- BASE URL CONFIG ----------
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+
+// ---------- HELPER FUNCTION ----------
+async function safeFetch(url, options) {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error("Network response not ok");
+    return res.json();
+  } catch (err) {
+    console.error("Fetch error:", err);
+    alert("Something went wrong! Try again later. ❌");
+    return null;
+  }
+}
+
 export default function App() {
+  // ------------------- STATES -------------------
   const [curtainOpen, setCurtainOpen] = useState(false);
   const [showCurtain, setShowCurtain] = useState(true);
 
@@ -9,7 +26,7 @@ export default function App() {
   const [comments, setComments] = useState([]);
   const [commentName, setCommentName] = useState("");
   const [commentInput, setCommentInput] = useState("");
-  const [showComments, setShowComments] = useState(false); // NEW: toggle display
+  const [showComments, setShowComments] = useState(false);
 
   // NEWSLETTER
   const [newsletterName, setNewsletterName] = useState("");
@@ -17,7 +34,7 @@ export default function App() {
   const [topic, setTopic] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
-  // Sparkles/confetti
+  // SPARKLES
   const curtainSparkles = Array.from({ length: 50 }, (_, i) => ({
     top: `${Math.random() * 100}%`,
     left: `${Math.random() * 100}%`,
@@ -25,18 +42,17 @@ export default function App() {
     duration: `${Math.random() * 2 + 1.5}s`,
   }));
 
-  // Fetch comments from backend
+  // ------------------- EFFECTS -------------------
+  // Fetch comments when toggled
   useEffect(() => {
     if (showComments) {
-      fetch("http://localhost:3001/comments")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) setComments(data.comments);
-        })
-        .catch((err) => console.error("Failed to fetch comments:", err));
+      safeFetch(`${BASE_URL}/comments`).then((data) => {
+        if (data?.success) setComments(data.comments);
+      });
     }
   }, [showComments]);
 
+  // ------------------- HANDLERS -------------------
   const handleCurtainClick = () => {
     setCurtainOpen(true);
     setTimeout(() => setShowCurtain(false), 3000);
@@ -48,22 +64,18 @@ export default function App() {
       alert("Please fill out both your name and comment! 😅");
       return;
     }
-    try {
-      const res = await fetch("http://localhost:3001/add-comment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: commentName.trim(), comment: commentInput.trim() }),
-      });
-      if (!res.ok) throw new Error("Failed to submit comment");
 
-      // Optimistic UI: add comment immediately
+    const data = await safeFetch(`${BASE_URL}/add-comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: commentName.trim(), comment: commentInput.trim() }),
+    });
+
+    if (data?.success) {
       setComments([{ name: commentName.trim(), comment: commentInput.trim() }, ...comments]);
       setCommentName("");
       setCommentInput("");
       alert("Comment submitted successfully! 🎉");
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong while submitting your comment. Try again! ❌");
     }
   };
 
@@ -73,25 +85,27 @@ export default function App() {
       alert("Please enter your name and email! 😅");
       return;
     }
-    try {
-      const res = await fetch("http://localhost:3001/add-newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newsletterName.trim(), email: email.trim(), topic: topic.trim() }),
-      });
-      if (!res.ok) throw new Error("Failed to submit newsletter");
 
+    const data = await safeFetch(`${BASE_URL}/add-newsletter`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newsletterName.trim(),
+        email: email.trim(),
+        topic: topic.trim(),
+      }),
+    });
+
+    if (data?.success) {
       setNewsletterSubmitted(true);
       setNewsletterName("");
       setEmail("");
       setTopic("");
       alert("Yay! You're now signed up for the newsletter! 💌");
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong while signing up. Try again! ❌");
     }
   };
 
+  // ------------------- RENDER -------------------
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-pink-100 to-pink-50 text-purple-900 font-sans relative">
       {/* CURTAIN */}
@@ -159,15 +173,11 @@ export default function App() {
           <textarea value={commentInput} onChange={(e) => setCommentInput(e.target.value)} placeholder="Write your comment..." className="p-4 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-300" required />
           <button type="submit" className="self-end px-6 py-2 bg-pink-300 text-white rounded-lg shadow hover:bg-pink-400 transition duration-300">Submit</button>
         </form>
-
-        {/* Toggle comments button */}
         <div className="mt-4 text-center">
           <button onClick={() => setShowComments(!showComments)} className="px-4 py-2 bg-purple-300 text-white rounded-lg shadow hover:bg-purple-400 transition duration-300">
             {showComments ? "Hide comments" : "Read what others have to say"}
           </button>
         </div>
-
-        {/* Comment list */}
         {showComments && (
           <div className="mt-6 space-y-2">
             {comments.length === 0 ? (
