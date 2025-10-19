@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 
 // ---------- BASE URL CONFIG ----------
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+const BASE_URL = "https://bree-site-backend-wr1l.vercel.app";
 
 // ---------- HELPER FUNCTION ----------
 async function safeFetch(url, options) {
@@ -46,7 +46,7 @@ export default function App() {
   // Fetch comments when toggled
   useEffect(() => {
     if (showComments) {
-      safeFetch(`${BASE_URL}/comments`).then((data) => {
+      safeFetch(`${BASE_URL}/api/comments`).then((data) => {
         if (data?.success) setComments(data.comments);
       });
     }
@@ -65,7 +65,7 @@ export default function App() {
       return;
     }
 
-    const data = await safeFetch(`${BASE_URL}/add-comment`, {
+    const data = await safeFetch(`${BASE_URL}/api/add-comment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: commentName.trim(), comment: commentInput.trim() }),
@@ -86,7 +86,7 @@ export default function App() {
       return;
     }
 
-    const data = await safeFetch(`${BASE_URL}/add-newsletter`, {
+    const data = await safeFetch(`${BASE_URL}/api/add-newsletter`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
