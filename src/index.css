@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Page background */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to bottom, #ffe6f0, #fff0f5);
+  overflow-x: hidden;
+}
+
+/* Theatre curtain wrapper */
+.curtain-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  overflow: hidden;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+
+/* Left & right curtain panels (velvet texture illusion) */
+.curtain-panel {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transition: transform 3s ease-in-out;
+  box-shadow: inset -4px 0 20px rgba(0,0,0,0.5);
+}
+
+/* Velvety gradient & folds */
+.velvet-left {
+  left: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    #8b0000,
+    #8b0000 10px,
+    #b20000 10px,
+    #b20000 20px
+  );
+}
+
+.velvet-right {
+  right: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #8b0000,
+    #8b0000 10px,
+    #b20000 10px,
+    #b20000 20px
+  );
+}
+
+/* Curtain opens slowly on click */
+.curtain-wrapper.open .velvet-left {
+  transform: translateX(-100%);
+}
+.curtain-wrapper.open .velvet-right {
+  transform: translateX(100%);
+}
+
+/* Sparkles/confetti animation */
+@keyframes curtainSparkle {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
+  50% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+}
+
+.curtain-sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: gold;
+  animation: curtainSparkle 1.5s infinite ease-in-out;
+  z-index: 101;
+}
+
+/* Click text on curtain */
+.curtain-text {
+  z-index: 102;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  pointer-events: none;
+  text-align: center;
+}
