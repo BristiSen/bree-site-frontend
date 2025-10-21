@@ -88,7 +88,10 @@ export default function App() {
 
     const data = await safeFetch(BASE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({
         name: newsletterName.trim(),
         email: email.trim(),
