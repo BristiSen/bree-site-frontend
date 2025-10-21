@@ -46,12 +46,22 @@ export default function App() {
   // ------------------- EFFECTS -------------------
   // Fetch comments when toggled
   useEffect(() => {
-    if (showComments) {
-      safeFetch(`${BASE_URL}/api/comments`).then((data) => {
-        if (data?.success) setComments(data.comments);
-      });
-    }
-  }, [showComments]);
+  if (showComments) {
+    const API = import.meta.env.VITE_APP_SCRIPT_COMMENT_URL;
+    fetch(API)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.status === "success" && Array.isArray(data.comments)) {
+          // Reverse order so latest comments appear first
+          setComments(data.comments.reverse());
+        } else {
+          console.error("Unexpected data format:", data);
+        }
+      })
+      .catch(err => console.error("Error fetching comments:", err));
+  }
+}, [showComments]);
+
 
   // ------------------- HANDLERS -------------------
   const handleCurtainClick = () => {
