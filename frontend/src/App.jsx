@@ -86,26 +86,57 @@ export default function App() {
       return;
     }
 
-    const data = await safeFetch(BASE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        name: newsletterName.trim(),
-        email: email.trim(),
-        topic: topic.trim(),
-      }),
-    });
+    try {
+      const params = {
+        method: "POST",
+        // headers: {
+        //   "Content-Type": "text/plain;charset=utf-8",
+        //   "Access-Control-Allow-Origin": "*",
+        // },
+        body: JSON.stringify({
+          name: newsletterName.trim(),
+          email: email.trim(),
+          topic: topic.trim(),
+        }),
+      }
 
-    if (data?.status === "success") {
-      setNewsletterSubmitted(true);
-      setNewsletterName("");
-      setEmail("");
-      setTopic("");
-      alert("Yay! You're now signed up for the newsletter! 💌");
+      // 
+      const response = await fetch(BASE_URL, params).then(res => res.json());
+
+      if (response?.status === "success") {
+        setNewsletterSubmitted(true);
+        setNewsletterName("");
+        setEmail("");
+        setTopic("");
+        alert("Yay! You're now signed up for the newsletter! 💌");
+      } else {
+        alert("Something went wrong! Try again later. ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong! Try again later. ❌");
     }
+
+    // const data = await safeFetch(BASE_URL, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "text/plain;charset=utf-8",
+    //     "Access-Control-Allow-Origin": "*",
+    //   },
+    //   body: JSON.stringify({
+    //     name: newsletterName.trim(),
+    //     email: email.trim(),
+    //     topic: topic.trim(),
+    //   }),
+    // });
+
+    // if (data?.status === "success") {
+    //   setNewsletterSubmitted(true);
+    //   setNewsletterName("");
+    //   setEmail("");
+    //   setTopic("");
+    //   alert("Yay! You're now signed up for the newsletter! 💌");
+    // }
   };
 
   // ------------------- RENDER -------------------
