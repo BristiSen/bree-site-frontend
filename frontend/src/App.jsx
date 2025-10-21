@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 
 // ---------- BASE URL CONFIG ----------
-const BASE_URL = "https://bree-site-backend-wr1l.vercel.app";
+const BASE_URL = import.meta.env.VITE_APP_SCRIPT_URL
 
 // ---------- HELPER FUNCTION ----------
 async function safeFetch(url, options) {
@@ -86,7 +86,7 @@ export default function App() {
       return;
     }
 
-    const data = await safeFetch(`${BASE_URL}/api/add-newsletter`, {
+    const data = await safeFetch(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -96,7 +96,7 @@ export default function App() {
       }),
     });
 
-    if (data?.success) {
+    if (data?.status === "success") {
       setNewsletterSubmitted(true);
       setNewsletterName("");
       setEmail("");
