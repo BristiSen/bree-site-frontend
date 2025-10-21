@@ -25,8 +25,9 @@ export default function App() {
   // COMMENTS
   const [comments, setComments] = useState([]);
   const [commentName, setCommentName] = useState("");
-  const [commentInput, setCommentInput] = useState("");
+  const [commentComment, setCommentComment] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [commentSubmitted, setCommentSubmitted] = useState(false);
 
   // NEWSLETTER
   const [newsletterName, setNewsletterName] = useState("");
@@ -60,22 +61,38 @@ export default function App() {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!commentName.trim() || !commentInput.trim()) {
+    if (!commentName.trim() || !commentComment.trim()) {
       alert("Please fill out both your name and comment! 😅");
       return;
     }
 
-    const data = await safeFetch(`${BASE_URL}/api/add-comment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: commentName.trim(), comment: commentInput.trim() }),
-    });
+    try{
+      const API = import.meta.env.VITE_APP_SCRIPT_COMMENT_URL;
+      const params = {
+        method: "POST",
+        //headers:{
+        // "Content-Type": "text/plain;charset=utf-8",
+        // "Access-control-Allow-Origin": "*",
+        // },
+        body: JSON.stringify({
+          name: commentName.trim(),
+          comment: commentComment.trim(),
+        }),
+      }
+      //
+      const response = await fetch(API, params).then(res => res.json());
 
-    if (data?.success) {
-      setComments([{ name: commentName.trim(), comment: commentInput.trim() }, ...comments]);
-      setCommentName("");
-      setCommentInput("");
-      alert("Comment submitted successfully! 🎉");
+      if (response?.status === "success") {
+        setCommentSubmitted(true);
+        setCommentName("");
+        setCommentComment("");
+        alert("Yay! Your comment has been successfully submitted! 💌");
+      } else {
+        alert("Something went wrong! Please try again later. ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong! Try again later. ❌");
     }
   };
 
@@ -87,6 +104,7 @@ export default function App() {
     }
 
     try {
+      const API = import.meta.env.VITE_APP_SCRIPT_NEWSLETTER_URL;
       const params = {
         method: "POST",
         // headers: {
@@ -101,7 +119,7 @@ export default function App() {
       }
 
       // 
-      const response = await fetch(BASE_URL, params).then(res => res.json());
+      const response = await fetch(API, params).then(res => res.json());
 
       if (response?.status === "success") {
         setNewsletterSubmitted(true);
@@ -116,27 +134,6 @@ export default function App() {
       console.error(err);
       alert("Something went wrong! Try again later. ❌");
     }
-
-    // const data = await safeFetch(BASE_URL, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "text/plain;charset=utf-8",
-    //     "Access-Control-Allow-Origin": "*",
-    //   },
-    //   body: JSON.stringify({
-    //     name: newsletterName.trim(),
-    //     email: email.trim(),
-    //     topic: topic.trim(),
-    //   }),
-    // });
-
-    // if (data?.status === "success") {
-    //   setNewsletterSubmitted(true);
-    //   setNewsletterName("");
-    //   setEmail("");
-    //   setTopic("");
-    //   alert("Yay! You're now signed up for the newsletter! 💌");
-    // }
   };
 
   // ------------------- RENDER -------------------
@@ -204,7 +201,7 @@ export default function App() {
         <h2 className="text-3xl font-semibold mb-6 text-center text-pink-400">💬 Your turn to yap back!</h2>
         <form onSubmit={handleCommentSubmit} className="flex flex-col space-y-4">
           <input type="text" value={commentName} onChange={(e) => setCommentName(e.target.value)} placeholder="Your name" className="p-4 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-300" required />
-          <textarea value={commentInput} onChange={(e) => setCommentInput(e.target.value)} placeholder="Write your comment..." className="p-4 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-300" required />
+          <textarea value={commentComment} onChange={(e) => setCommentComment(e.target.value)} placeholder="Write your comment..." className="p-4 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-300" required />
           <button type="submit" className="self-end px-6 py-2 bg-pink-300 text-white rounded-lg shadow hover:bg-pink-400 transition duration-300">Submit</button>
         </form>
         <div className="mt-4 text-center">
