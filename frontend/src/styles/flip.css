@@ -1,0 +1,69 @@
+/* FLIP CARD LAYOUT */
+.flip-container {
+  perspective: 1200px;
+  position: relative;
+  min-height: 80vh;
+}
+
+.flipper {
+  transition: transform 0.9s cubic-bezier(.2,.9,.2,1);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* When flipped, rotate the card */
+.flip-container.flipped .flipper {
+  transform: rotateY(180deg);
+}
+
+/* front/back */
+.front, .back {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  min-height: 80vh;
+  display: block;
+  padding: 0.75rem;
+}
+
+/* front is professional (visible by default) */
+.front {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+/* back is the whimsical side (hidden until flipped) */
+.back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* optional: subtle floating shadow */
+.flip-container .front, .flip-container .back {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* GOLD SLIDING DOORS (if you later want door overlays) */
+.gold-door-left, .gold-door-right {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50%;
+  background: linear-gradient(180deg, #b8860b, #ffd54f);
+  box-shadow: inset -6px 0 30px rgba(0,0,0,0.25);
+  transition: transform 1.2s ease;
+  z-index: 40;
+}
+.gold-door-left { left: 0; transform: translateX(0%); }
+.gold-door-right { right: 0; transform: translateX(0%); }
+
+/* Doors open (example class usage) */
+.doors-open .gold-door-left { transform: translateX(-110%); }
+.doors-open .gold-door-right { transform: translateX(110%); }
+
+/* ensure mobile friendliness */
+@media (max-width: 768px) {
+  .flip-container { padding: 1rem; }
+}

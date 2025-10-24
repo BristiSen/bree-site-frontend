@@ -1,93 +1,157 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ===== FLIP + CURTAIN + WHIMSICAL BASE STYLES ===== */
 
-/* Page background */
+/* So main layout has room for flip-container overlay */
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to bottom, #ffe6f0, #fff0f5);
   overflow-x: hidden;
 }
 
-/* Theatre curtain wrapper */
-.curtain-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  display: flex;
-  overflow: hidden;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
+/* 🎴 FLIP CARD LAYOUT */
+.flip-container {
+  perspective: 1200px;
+  position: relative;
+  min-height: 100vh;
 }
 
-/* Left & right curtain panels (velvet texture illusion) */
+.flipper {
+  transition: transform 0.9s cubic-bezier(.2,.9,.2,1);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.flip-container.flipped .flipper {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: block;
+}
+
+.front { 
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+.back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+.flip-container .front,
+.flip-container .back {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===== GOLD SLIDING DOORS (if used later) ===== */
+.gold-door-left, .gold-door-right {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50%;
+  background: linear-gradient(180deg, #b8860b, #ffd54f);
+  box-shadow: inset -6px 0 30px rgba(0,0,0,0.25);
+  transition: transform 1.2s ease;
+  z-index: 40;
+}
+.gold-door-left { left: 0; transform: translateX(0%); }
+.gold-door-right { right: 0; transform: translateX(0%); }
+
+.doors-open .gold-door-left { transform: translateX(-110%); }
+.doors-open .gold-door-right { transform: translateX(110%); }
+
+
+/* ===== WHIMSICAL CURTAINS ===== */
+.curtain-wrapper {
+  position: fixed;
+  inset: 0;
+  background: #00000066;
+  z-index: 100;
+  cursor: pointer;
+  overflow: hidden;
+}
+
 .curtain-panel {
   position: absolute;
   top: 0;
   width: 50%;
   height: 100%;
-  transition: transform 3s ease-in-out;
-  box-shadow: inset -4px 0 20px rgba(0,0,0,0.5);
+  background: #b03060;
+  transition: transform 2.5s cubic-bezier(.1,.7,.4,1);
 }
 
-/* Velvety gradient & folds */
-.velvet-left {
+.curtain-left {
   left: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    #8b0000,
-    #8b0000 10px,
-    #b20000 10px,
-    #b20000 20px
-  );
+  transform: translateX(0%);
 }
 
-.velvet-right {
+.curtain-right {
   right: 0;
-  background: repeating-linear-gradient(
-    -45deg,
-    #8b0000,
-    #8b0000 10px,
-    #b20000 10px,
-    #b20000 20px
-  );
+  transform: translateX(0%);
 }
 
-/* Curtain opens slowly on click */
-.curtain-wrapper.open .velvet-left {
+.curtain-wrapper.open .curtain-left {
   transform: translateX(-100%);
 }
-.curtain-wrapper.open .velvet-right {
+
+.curtain-wrapper.open .curtain-right {
   transform: translateX(100%);
 }
 
-/* Sparkles/confetti animation */
-@keyframes curtainSparkle {
-  0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
-  50% { opacity: 1; transform: translateY(-20px) scale(1.2); }
-}
-
+/* ✨ Sparkles */
 .curtain-sparkle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  background: white;
   border-radius: 50%;
-  background: gold;
-  animation: curtainSparkle 1.5s infinite ease-in-out;
-  z-index: 101;
+  opacity: 0.8;
+  animation: sparkle infinite alternate ease-in-out;
 }
 
-/* Click text on curtain */
+@keyframes sparkle {
+  0% { transform: scale(1); opacity: .5; }
+  100% { transform: scale(1.8); opacity: 1; }
+}
+
+/* White text centered */
 .curtain-text {
-  z-index: 102;
-  color: white;
-  font-size: 2rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+/* ===== FLIP TOGGLE BUTTON ===== */
+.flip-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 200;
+  background: #ffd1f7;
+  color: #7a1c75;
   font-weight: bold;
-  pointer-events: none;
-  text-align: center;
+  padding: 10px 16px;
+  border-radius: 50px;
+  border: 2px solid #ff9ae9;
+  cursor: pointer;
+  transform: rotate(-4deg);
+  transition: 0.3s;
+  box-shadow: 0 0 10px rgba(255, 109, 221, 0.6);
+}
+
+.flip-toggle-btn:hover {
+  transform: rotate(0deg) scale(1.07);
+  box-shadow: 0 0 15px rgba(255, 88, 198, 0.9);
+}
+
+/* 📱 Mobile Fixes */
+@media (max-width: 768px) {
+  .flip-toggle-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+    right: 12px;
+  }
 }
